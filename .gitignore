@@ -3,7 +3,6 @@ target/
 **/target/
 build/
 **/build/
-out/
 bin/
 *.class
 
