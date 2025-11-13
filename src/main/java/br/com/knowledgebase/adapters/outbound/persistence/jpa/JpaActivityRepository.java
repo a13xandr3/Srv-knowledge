@@ -1,0 +1,25 @@
+package br.com.knowledgebase.adapters.outbound.persistence.jpa;
+
+import br.com.knowledgebase.adapters.outbound.persistence.jpa.entity.ActivityJpaEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface JpaActivityRepository extends JpaRepository<ActivityJpaEntity, Long> {
+
+    @Query("""
+    select e from ActivityJpaEntity e
+    where (:term is null or :term = ''
+       or lower(e.name)       like lower(concat('%', :term, '%'))
+       or lower(e.categoria)    like lower(concat('%', :term, '%'))
+       or lower(e.subCategoria) like lower(concat('%', :term, '%'))
+       or lower(e.descricao)    like lower(concat('%', :term, '%'))
+    )
+  """)
+
+    Page<ActivityJpaEntity> search(@Param("term") String term, Pageable pageable);
+}

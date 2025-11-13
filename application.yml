@@ -1,0 +1,64 @@
+server:
+  port: 8081
+  tomcat:
+    max-swallow-size: -1
+
+spring:
+  config:
+    import: "optional:configtree:${SECRETS_DIR:${user.home}/.secrets}/"
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+    open-in-view: false
+    properties:
+      hibernate:
+        # dialect: org.hibernate.dialect.MySQLDialect
+  servlet:
+    multipart:
+      max-file-size: 500MB
+      max-request-size: 500MB
+  sql:
+    init:
+      mode: always
+
+crypto:
+  rsa:
+    enabled: true
+    oaep-hash: SHA-256
+    private-key-path: /Users/alexandreesteves/.keys/rsa_private.pem
+    public-key-path: /Users/alexandreesteves/.keys/rsa_public.pem
+
+logging:
+  level:
+    org.hibernate.SQL: debug
+    org.hibernate.type.descriptor.sql.BasicBinder: trace
+    org.hibernate.orm.connections: DEBUG
+    org.hibernate.type.descriptor.sql: TRACE
+    org.hibernate.metamodel.model.domain.internal: DEBUG
+    org.hibernate.persister.entity: TRACE
+    org.springframework.security: TRACE
+
+security:
+  jwt:
+    issuer: knowledgebase
+    secret: ${JWT_SECRET}
+    base64: false
+    expiration-seconds: 3600
+
+  service-token:
+    issuer: bff-knowledgebase
+    expiration-seconds: 300
+    hmac-secret: ${HMAC_SECRET}
+
+  password-crypto:
+    enabled: true
+    oaep-hash: "SHA-256"
+    private-key-pem: ${PASSWORD_CRYPTO_PRIVATE_KEY_PEM}
+    public-key-pem:  ${PASSWORD_CRYPTO_PUBLIC_KEY_PEM}
