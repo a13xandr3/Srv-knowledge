@@ -6,8 +6,6 @@ import br.com.knowledgebase.domain.ports.out.TwoFactorServicePort;
 import br.com.knowledgebase.domain.ports.out.UserRepositoryPort;
 import org.springframework.stereotype.Service;
 
-import java.util.NoSuchElementException;
-
 @Service
 public class TwoFactorVerifyUseCaseImpl implements TwoFactorVerifyUseCase {
     private final UserRepositoryPort userRepo;

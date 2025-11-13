@@ -1,4 +1,3 @@
-// src/main/java/br/com/knowledgebase/adapters/outbound/persistence/jpa/JpaUserRepository.java
 package br.com.knowledgebase.adapters.outbound.persistence.jpa;
 
 import br.com.knowledgebase.adapters.outbound.persistence.jpa.entity.UserJpaEntity;

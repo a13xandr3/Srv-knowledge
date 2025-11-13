@@ -12,7 +12,6 @@ import java.time.Instant;
 import java.util.Date;
 
 import br.com.knowledgebase.domain.ports.out.TokenProviderPort;
-import org.springframework.stereotype.Component;
 
 @Component
 public class JwtTokenProvider implements TokenProviderPort {

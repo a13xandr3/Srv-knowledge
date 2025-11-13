@@ -81,5 +81,4 @@ public class Activity {
     public void updateFrom(Activity src) {
         updateFrom(src, null);
     }
-
 }

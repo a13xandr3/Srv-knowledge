@@ -50,5 +50,4 @@ public final class ActivityMapper {
         e.setDataSaidaNoite(d.getDataSaidaNoite());
         return e;
     }
-
 }

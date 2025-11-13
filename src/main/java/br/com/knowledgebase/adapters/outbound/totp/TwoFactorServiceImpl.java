@@ -46,23 +46,4 @@ public class TwoFactorServiceImpl implements TwoFactorServicePort {
             return false;
         }
     }
-
-    /*
-    @Override
-    public boolean isValidCode(String secretBase32, String code6) {
-        try {
-            var base32 = new Base32();
-            byte[] key = base32.decode(secretBase32);
-
-            var totp = new TimeBasedOneTimePasswordGenerator(); // padrão 30s, 6 dígitos, HMAC-SHA1
-            var mac = Mac.getInstance(totp.getAlgorithm());
-            mac.init(new SecretKeySpec(key, totp.getAlgorithm()));
-            int expected = totp.generateOneTimePassword(mac, Instant.now());
-
-            return String.format("%06d", expected).equals(code6);
-        } catch (Exception e) {
-            return false;
-        }
-    }
-     */
 }

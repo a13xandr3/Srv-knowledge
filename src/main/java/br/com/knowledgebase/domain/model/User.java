@@ -47,5 +47,4 @@ public class User {
     public void setTwoFaEnabled(boolean twoFaEnabled) {
         this.twoFaEnabled = twoFaEnabled;
     }
-
 }

@@ -1,4 +1,3 @@
-// src/main/java/br/com/teixeiraesteves/atividades/adapters/outbound/persistence/jpa/entity/ActivityJpaEntity.java
 package br.com.knowledgebase.adapters.outbound.persistence.jpa.entity;
 
 import br.com.knowledgebase.adapters.outbound.persistence.jpa.converter.JsonMapConverter;
