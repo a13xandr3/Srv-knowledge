@@ -2,6 +2,7 @@ package br.com.knowledgebase.adapters.inbound.web;
 
 import br.com.knowledgebase.domain.ports.in.FileUseCase;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
@@ -16,6 +17,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.io.IOException;
 
+@SecurityRequirement(name = "bearerAuth")
 @RestController
 @RequestMapping("/api/files")
 public class FilesController {

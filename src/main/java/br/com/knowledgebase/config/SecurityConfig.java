@@ -46,16 +46,24 @@ public class SecurityConfig {
     @Bean
     @Order(1)
     SecurityFilterChain apiFilterChain(HttpSecurity http) throws Exception {
-        http.csrf(csrf -> csrf.disable())
+        http
+            .csrf(csrf -> csrf.disable())
             .cors(cors -> {})
             .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                 .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
-                 .requestMatchers(HttpMethod.POST, "/api/2fa/setup", "/api/2fa/verify").permitAll()
-                 .requestMatchers(HttpMethod.GET, "/api/auth/public-key", "/actuator/health").permitAll()
-                 .requestMatchers(SWAGGER).permitAll()
-                 .requestMatchers("/error").permitAll()
-                 .anyRequest().authenticated()
+                    // Swagger e erro continuam livres
+                    .requestMatchers(SWAGGER).permitAll()
+                    .requestMatchers("/error").permitAll()
+
+                    // Libera autenticação e 2FA
+                    .requestMatchers("/api/auth/**").permitAll()
+
+                    // Protege endpoints de domínio
+                    .requestMatchers("/api/atividade/**").authenticated()
+                    .requestMatchers("/api/files/**").authenticated()
+
+                    // Qualquer outra coisa é bloqueada explicitamente
+                    .anyRequest().denyAll()
             )
             .oauth2ResourceServer(oauth -> oauth.jwt())
             .exceptionHandling(e -> e.authenticationEntryPoint((req, res, ex) -> {
