@@ -1,5 +1,7 @@
 package br.com.knowledgebase.application.usecases;
 
+import br.com.knowledgebase.domain.ports.in.ActivityFilterParams;
+import br.com.knowledgebase.domain.ports.in.ActivityPageResult;
 import org.springframework.stereotype.Service;
 
 import br.com.knowledgebase.domain.model.Activity;
@@ -52,5 +54,24 @@ public class ActivityUseCaseImpl implements ActivityUseCase {
     @Override
     public List<Activity> search(String term, int page, int size) {
         return repo.search(term, page, size);
+    }
+
+    @Override
+    public ActivityPageResult listWithFilters(ActivityFilterParams filterParams, int page, int size) {
+
+        // ponto único para colocar sua REGRA de filtro/paginação
+        // por enquanto, exemplo simples delegando para list(...)
+        // depois você pode encaixar aqui a mesma lógica que estava no controller.
+
+        List<Activity> activities = list(page, size);
+
+        int total = activities.size(); // ou use o count do repositório, se tiver
+
+        return new ActivityPageResult(
+                activities,
+                total,
+                page,
+                size
+        );
     }
 }
