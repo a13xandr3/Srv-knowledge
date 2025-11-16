@@ -60,6 +60,7 @@ public class AuthController {
 
     // DTOs locais ao controller
     public record LoginRequest(String username, String password, String totp) {}
+
     public record TwoFactorVerifyRequest(String username, String code) {}
 
     @JsonInclude(JsonInclude.Include.NON_NULL)

@@ -59,4 +59,10 @@ public class ActivityRepositoryAdapter implements ActivityRepositoryPort {
                 .map(ActivityMapper::toDomain) // Page<Activity>
                 .getContent();                // List<Activity>
     }
+
+    @Override
+    public List<String> findDistinctCategorias() {
+        return jpa.findDistinctCategorias();
+    }
+
 }

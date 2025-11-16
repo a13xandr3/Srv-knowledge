@@ -1,13 +1,18 @@
 package br.com.knowledgebase.domain.ports.in;
 
+import br.com.knowledgebase.adapters.inbound.web.dto.FileSavedResponse;
 import br.com.knowledgebase.domain.model.FileAsset;
+import br.com.knowledgebase.domain.model.FileRawData;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface FileUseCase {
-    FileAsset upload(String originalFilename, String mimeType, byte[] content, String hashMode);
+
+    FileSavedResponse upload(FileUploadCommand command);
+
     Optional<FileAsset> get(Long id);
-    byte[] downloadRaw(Long id);
-    List<FileAsset> list(int page, int size);
+
+    FileRawData loadRaw(Long id) throws Exception;
+
 }

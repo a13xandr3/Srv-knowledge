@@ -9,9 +9,9 @@ import br.com.knowledgebase.domain.ports.in.ActivityUseCase;
 import br.com.knowledgebase.domain.ports.out.ActivityRepositoryPort;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
+import java.util.*;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 @Service
 public class ActivityUseCaseImpl implements ActivityUseCase {
@@ -74,4 +74,32 @@ public class ActivityUseCaseImpl implements ActivityUseCase {
                 size
         );
     }
+
+    @Override
+    public List<String> listarCategorias(List<String> excessao) {
+        final var excNorm = toNormalizedSet(excessao);
+
+        return repo.findDistinctCategorias().stream()
+                .filter(Objects::nonNull)
+                .map(String::strip)
+                .filter(Predicate.not(String::isBlank))
+                .filter(cat -> {
+                    String norm = ActivityFilterParams.normalize(cat);
+                    return excNorm.isEmpty() || !excNorm.contains(norm);
+                })
+                .distinct()
+                .sorted(String.CASE_INSENSITIVE_ORDER)
+                .toList();
+    }
+
+    private Set<String> toNormalizedSet(List<String> items) {
+        if (items == null) return Set.of();
+        return items.stream()
+                .filter(Objects::nonNull)
+                .map(String::strip)
+                .filter(Predicate.not(String::isBlank))
+                .map(ActivityFilterParams::normalize)
+                .collect(Collectors.toUnmodifiableSet());
+    }
+
 }

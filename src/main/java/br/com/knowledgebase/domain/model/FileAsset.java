@@ -7,11 +7,10 @@ public class FileAsset {
     private Long id;
     private String filename;
     private String mimeType;
-    private long sizeBytes;
+    private String contentEncoding;
+    private String sha256Hex;
+    private Long originalSizeBytes;
     private Long gzipSizeBytes;
-    private String hashSha256Hex;
-    private String hashMode;
-    private String storagePath;
     private LocalDateTime createdAt;
 
     public void onCreate() {
@@ -42,12 +41,28 @@ public class FileAsset {
         this.mimeType = mimeType;
     }
 
-    public long getSizeBytes() {
-        return sizeBytes;
+    public String getContentEncoding() {
+        return contentEncoding;
     }
 
-    public void setSizeBytes(long sizeBytes) {
-        this.sizeBytes = sizeBytes;
+    public void setContentEncoding(String contentEncoding) {
+        this.contentEncoding = contentEncoding;
+    }
+
+    public String getSha256Hex() {
+        return sha256Hex;
+    }
+
+    public void setSha256Hex(String sha256Hex) {
+        this.sha256Hex = sha256Hex;
+    }
+
+    public Long getOriginalSizeBytes() {
+        return originalSizeBytes;
+    }
+
+    public void setOriginalSizeBytes(Long originalSizeBytes) {
+        this.originalSizeBytes = originalSizeBytes;
     }
 
     public Long getGzipSizeBytes() {
@@ -56,30 +71,6 @@ public class FileAsset {
 
     public void setGzipSizeBytes(Long gzipSizeBytes) {
         this.gzipSizeBytes = gzipSizeBytes;
-    }
-
-    public String getHashSha256Hex() {
-        return hashSha256Hex;
-    }
-
-    public void setHashSha256Hex(String hashSha256Hex) {
-        this.hashSha256Hex = hashSha256Hex;
-    }
-
-    public String getHashMode() {
-        return hashMode;
-    }
-
-    public void setHashMode(String hashMode) {
-        this.hashMode = hashMode;
-    }
-
-    public String getStoragePath() {
-        return storagePath;
-    }
-
-    public void setStoragePath(String storagePath) {
-        this.storagePath = storagePath;
     }
 
     public LocalDateTime getCreatedAt() {

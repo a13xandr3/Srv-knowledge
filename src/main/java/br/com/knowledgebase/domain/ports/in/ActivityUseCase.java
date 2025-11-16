@@ -13,4 +13,5 @@ public interface ActivityUseCase {
     List<Activity> list(int page, int size);
     List<Activity> search(String term, int page, int size);
     ActivityPageResult listWithFilters(ActivityFilterParams filterParams, int page, int size);
+    List<String> listarCategorias(List<String> excessao);
 }

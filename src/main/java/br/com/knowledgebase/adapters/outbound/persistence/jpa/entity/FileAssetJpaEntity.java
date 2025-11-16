@@ -2,38 +2,41 @@ package br.com.knowledgebase.adapters.outbound.persistence.jpa.entity;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
-import static jakarta.persistence.GenerationType.IDENTITY;
 
 @Entity
 @Table(name = "files")
 public class FileAssetJpaEntity {
 
-    @Id @GeneratedValue(strategy = IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name="filename", nullable=false, length=255)
     private String filename;
 
-    @Column(name="mimeType", length=255)
+    @Column(name="mime_type", length=255)
     private String mimeType;
 
-    @Column(name="sizeBytes")
-    private Long sizeBytes;
+    @Column(name="content_encoding", nullable = false, length = 16)
+    private String contentEncoding;
 
-    @Column(name="gzipSizeBytes")
+    @Column(name="sha256_hex", nullable = false, unique = true, length=64)
+    private String sha256Hex;
+
+    @Column(name="original_size_bytes", nullable = false)
+    private Long originalSizeBytes;
+
+    @Column(name="gzip_size_bytes")
     private Long gzipSizeBytes;
 
-    @Column(name="hashSha256Hex", length=128)
-    private String hashSha256Hex;
-
-    @Column(name="hashMode", length=32)
-    private String hashMode;
-
-    @Column(name="storagePath", length=512)
-    private String storagePath;
+    @Lob
+    @Basic(fetch = FetchType.LAZY)
+    @Column(name = "payload", nullable = false, columnDefinition = "LONGBLOB")
+    private byte[] payload;
 
     @Column(name="createdAt")
     private LocalDateTime createdAt;
+
 
     public Long getId() {
         return id;
@@ -59,12 +62,28 @@ public class FileAssetJpaEntity {
         this.mimeType = mimeType;
     }
 
-    public Long getSizeBytes() {
-        return sizeBytes;
+    public String getContentEncoding() {
+        return contentEncoding;
     }
 
-    public void setSizeBytes(Long sizeBytes) {
-        this.sizeBytes = sizeBytes;
+    public void setContentEncoding(String contentEncoding) {
+        this.contentEncoding = contentEncoding;
+    }
+
+    public String getSha256Hex() {
+        return sha256Hex;
+    }
+
+    public void setSha256Hex(String sha256Hex) {
+        this.sha256Hex = sha256Hex;
+    }
+
+    public Long getOriginalSizeBytes() {
+        return originalSizeBytes;
+    }
+
+    public void setOriginalSizeBytes(Long originalSizeBytes) {
+        this.originalSizeBytes = originalSizeBytes;
     }
 
     public Long getGzipSizeBytes() {
@@ -75,28 +94,12 @@ public class FileAssetJpaEntity {
         this.gzipSizeBytes = gzipSizeBytes;
     }
 
-    public String getHashSha256Hex() {
-        return hashSha256Hex;
+    public byte[] getPayload() {
+        return payload;
     }
 
-    public void setHashSha256Hex(String hashSha256Hex) {
-        this.hashSha256Hex = hashSha256Hex;
-    }
-
-    public String getHashMode() {
-        return hashMode;
-    }
-
-    public void setHashMode(String hashMode) {
-        this.hashMode = hashMode;
-    }
-
-    public String getStoragePath() {
-        return storagePath;
-    }
-
-    public void setStoragePath(String storagePath) {
-        this.storagePath = storagePath;
+    public void setPayload(byte[] payload) {
+        this.payload = payload;
     }
 
     public LocalDateTime getCreatedAt() {
@@ -106,6 +109,4 @@ public class FileAssetJpaEntity {
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
-
-
 }

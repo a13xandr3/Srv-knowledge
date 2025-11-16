@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface JpaActivityRepository extends JpaRepository<ActivityJpaEntity, Long> {
 
@@ -22,4 +24,7 @@ public interface JpaActivityRepository extends JpaRepository<ActivityJpaEntity, 
   """)
 
     Page<ActivityJpaEntity> search(@Param("term") String term, Pageable pageable);
+
+    @Query("select distinct a.categoria from ActivityJpaEntity a")
+    List<String> findDistinctCategorias();
 }

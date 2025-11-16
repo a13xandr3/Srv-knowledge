@@ -13,11 +13,10 @@ public final class FileAssetMapper {
         d.setId(e.getId());
         d.setFilename(e.getFilename());
         d.setMimeType(e.getMimeType());
-        d.setSizeBytes(e.getSizeBytes() == null ? 0L : e.getSizeBytes());
+        d.setContentEncoding(e.getContentEncoding());
+        d.setSha256Hex(e.getSha256Hex());
+        d.setOriginalSizeBytes(e.getOriginalSizeBytes() == null ? 0L : e.getOriginalSizeBytes());
         d.setGzipSizeBytes(e.getGzipSizeBytes());
-        d.setHashSha256Hex(e.getHashSha256Hex());
-        d.setHashMode(e.getHashMode());
-        d.setStoragePath(e.getStoragePath());
         d.setCreatedAt(e.getCreatedAt());
         return d;
     }
@@ -28,11 +27,10 @@ public final class FileAssetMapper {
         e.setId(d.getId());
         e.setFilename(d.getFilename());
         e.setMimeType(d.getMimeType());
-        e.setSizeBytes(d.getSizeBytes());
+        e.setContentEncoding(d.getContentEncoding());
+        e.setSha256Hex(d.getSha256Hex());
+        e.setOriginalSizeBytes(d.getOriginalSizeBytes());
         e.setGzipSizeBytes(d.getGzipSizeBytes());
-        e.setHashSha256Hex(d.getHashSha256Hex());
-        e.setHashMode(d.getHashMode());
-        e.setStoragePath(d.getStoragePath());
         e.setCreatedAt(d.getCreatedAt());
         return e;
     }

@@ -2,8 +2,8 @@ package br.com.knowledgebase.application.usecases;
 
 import org.springframework.stereotype.Service;
 
-import br.com.knowledgebase.domain.ports.out.TotpProvisioningPort;
 import br.com.knowledgebase.domain.ports.in.TwoFactorSetupUseCase;
+import br.com.knowledgebase.domain.ports.out.TotpProvisioningPort;
 import br.com.knowledgebase.domain.ports.out.UserRepositoryPort;
 
 import java.util.NoSuchElementException;

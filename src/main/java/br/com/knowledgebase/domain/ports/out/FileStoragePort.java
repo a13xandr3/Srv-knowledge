@@ -10,7 +10,4 @@ public interface FileStoragePort {
      * Lê todos os bytes do caminho físico previamente salvo.
      */
     byte[] read(String storagePath) throws Exception;
-
-    // Se desejar streaming no futuro, acrescente sem acoplar a repositório:
-    // InputStream openStream(String storagePath) throws Exception;
 }

@@ -7,7 +7,6 @@ import br.com.knowledgebase.domain.model.Activity;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -77,5 +76,14 @@ public class ActivitiesController {
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         activityUseCase.delete(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/categorias")
+    @Operation(summary = "Lista Categorias")
+    public ResponseEntity<List<String>> getCategorias(
+            @RequestParam(name = "excessao", required = false) List<String> excessao
+        ) {
+        final var categorias = activityUseCase.listarCategorias(excessao);
+        return ResponseEntity.ok(categorias);
     }
 }

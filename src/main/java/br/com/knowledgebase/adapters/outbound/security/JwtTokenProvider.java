@@ -1,14 +1,14 @@
 package br.com.knowledgebase.adapters.outbound.security;
 
 import br.com.knowledgebase.domain.ports.out.TokenProviderPort;
+import javax.crypto.SecretKey;
+
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import java.nio.charset.StandardCharsets;
 import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Component;
 
-import javax.crypto.SecretKey;
-import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.Date;
 
@@ -27,24 +27,6 @@ public class JwtTokenProvider implements TokenProviderPort {
         // Usa diretamente o segredo em texto simples configurado em security.jwt.secret
         this.key = Keys.hmacShaKeyFor(props.getSecret().getBytes(StandardCharsets.UTF_8));
     }
-
-    /*
-    @PostConstruct
-    void init() {
-        if (props.getSecret() == null || props.getSecret().isBlank()) {
-            throw new IllegalStateException("JWT secret não definido (security.jwt.secret)");
-        }
-        byte[] keyBytes = props.isBase64()
-                ? Decoders.BASE64.decode(props.getSecret())
-                : props.getSecret().getBytes(StandardCharsets.UTF_8);
-
-        // HS256 exige >= 256 bits (32 bytes)
-        if (keyBytes.length < 32) {
-            throw new IllegalStateException("JWT secret deve ter pelo menos 32 bytes (256 bits). Tam atual: " + keyBytes.length);
-        }
-        this.key = Keys.hmacShaKeyFor(keyBytes);
-    }
-    */
 
     @Override
     public String generate(String subject) {
