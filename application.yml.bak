@@ -62,18 +62,3 @@ security:
     oaep-hash: "SHA-256"
     private-key-pem: ${PASSWORD_CRYPTO_PRIVATE_KEY_PEM}
     public-key-pem:  ${PASSWORD_CRYPTO_PUBLIC_KEY_PEM}
-
-springdoc:
-  swagger-ui:
-    path: /swagger-ui.html
-    urls:
-      - name: files
-        url: /v3/api-docs/files
-      - name: auth
-        url: /v3/api-docs/auth
-      - name: 2fa
-        url: /v3/api-docs/2fa
-      - name: activities
-        url: /v3/api-docs/activities
-    operationsSorter: method
-    tagsSorter: alpha

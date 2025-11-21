@@ -3,21 +3,28 @@ package br.com.knowledgebase.adapters.outbound.persistence;
 import br.com.knowledgebase.adapters.outbound.persistence.jpa.JpaActivityRepository;
 import br.com.knowledgebase.adapters.outbound.persistence.jpa.mapper.ActivityMapper;
 import br.com.knowledgebase.domain.model.Activity;
+import br.com.knowledgebase.domain.model.TagWrapper;
 import br.com.knowledgebase.domain.ports.out.ActivityRepositoryPort;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 @Component
 public class ActivityRepositoryAdapter implements ActivityRepositoryPort {
 
     private final JpaActivityRepository jpa;
+    private final ObjectMapper objectMapper;
 
-    public ActivityRepositoryAdapter(JpaActivityRepository jpa) {
+    public ActivityRepositoryAdapter(JpaActivityRepository jpa, ObjectMapper objectMapper) {
         this.jpa = jpa;
+        this.objectMapper = objectMapper;
     }
 
     @Override
@@ -65,4 +72,23 @@ public class ActivityRepositoryAdapter implements ActivityRepositoryPort {
         return jpa.findDistinctCategorias();
     }
 
+    @Override
+    public List<String> findDistinctTags() {
+        return jpa.findAll().stream()
+                .map(ActivityMapper::toDomain) // Garante acesso ao campo corretamente mapeado
+                .map(Activity::getTag)
+                .filter(Objects::nonNull)
+                .flatMap(tagJson -> {
+                    try {
+                        TagWrapper wrapper = objectMapper.convertValue(tagJson, TagWrapper.class);
+                        return wrapper.tags() != null ? wrapper.tags().stream() : Stream.empty();
+                    } catch (Exception e) {
+                        // Ideal: fazer log do erro
+                        return Stream.empty();
+                    }
+                })
+                .distinct()
+                .sorted()
+                .toList();
+    }
 }

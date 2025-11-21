@@ -25,7 +25,7 @@ public class TwoFactorController {
     }
 
     @Tag(name = "2FA")
-    @PostMapping("/setup")
+    @PostMapping(value = "/setup", produces = org.springframework.http.MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Cria segredo TOTP e retorna otpauth URI")
     public ResponseEntity<?> setup(@jakarta.validation.Valid @RequestBody TwoFactorSetupRequest body) {
 
@@ -36,7 +36,7 @@ public class TwoFactorController {
         return ResponseEntity.ok(Map.of("otpAuth", otpAuth));
     }
 
-    @PostMapping("/verify")
+    @PostMapping(value = "/verify", produces = org.springframework.http.MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Valida TOTP e emite JWT")
     public ResponseEntity<?> verify(@jakarta.validation.Valid @RequestBody TwoFactorVerifyRequest body) {
         String username = body.username();

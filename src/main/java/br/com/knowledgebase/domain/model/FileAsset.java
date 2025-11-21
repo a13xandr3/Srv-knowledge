@@ -1,83 +1,45 @@
 package br.com.knowledgebase.domain.model;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 public class FileAsset {
-
     private Long id;
-    private String filename;
-    private String mimeType;
-    private String contentEncoding;
-    private String sha256Hex;
-    private Long originalSizeBytes;
-    private Long gzipSizeBytes;
-    private LocalDateTime createdAt;
+    private final String filename;
+    private final String mimeType;
+    private final ContentEncoding contentEncoding;
+    private final Long gzipSizeBytes;      // pode ser null quando identity
+    private final long originalSizeBytes;
+    private final String sha256Hex;        // 64 chars
+    private final byte[] payload;          // binário persistido
 
-    public void onCreate() {
-        this.createdAt = LocalDateTime.now();
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
+    public FileAsset(
+            Long id,
+            String filename,
+            String mimeType,
+            ContentEncoding contentEncoding,
+            Long gzipSizeBytes,
+            long originalSizeBytes,
+            String sha256Hex,
+            byte[] payload
+    ) {
         this.id = id;
-    }
-
-    public String getFilename() {
-        return filename;
-    }
-
-    public void setFilename(String filename) {
-        this.filename = filename;
-    }
-
-    public String getMimeType() {
-        return mimeType;
-    }
-
-    public void setMimeType(String mimeType) {
+        this.filename = Objects.requireNonNull(filename);
         this.mimeType = mimeType;
-    }
-
-    public String getContentEncoding() {
-        return contentEncoding;
-    }
-
-    public void setContentEncoding(String contentEncoding) {
-        this.contentEncoding = contentEncoding;
-    }
-
-    public String getSha256Hex() {
-        return sha256Hex;
-    }
-
-    public void setSha256Hex(String sha256Hex) {
-        this.sha256Hex = sha256Hex;
-    }
-
-    public Long getOriginalSizeBytes() {
-        return originalSizeBytes;
-    }
-
-    public void setOriginalSizeBytes(Long originalSizeBytes) {
-        this.originalSizeBytes = originalSizeBytes;
-    }
-
-    public Long getGzipSizeBytes() {
-        return gzipSizeBytes;
-    }
-
-    public void setGzipSizeBytes(Long gzipSizeBytes) {
+        this.contentEncoding = Objects.requireNonNull(contentEncoding);
         this.gzipSizeBytes = gzipSizeBytes;
+        this.originalSizeBytes = originalSizeBytes;
+        this.sha256Hex = Objects.requireNonNull(sha256Hex);
+        this.payload = Objects.requireNonNull(payload);
     }
 
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
+    public Long getId() { return id; }
+    public void setId(Long id){ this.id = id; }
+    public String getFilename(){ return filename; }
+    public String getMimeType(){ return mimeType; }
+    public ContentEncoding getContentEncoding(){ return contentEncoding; }
+    public Long getGzipSizeBytes(){ return gzipSizeBytes; }
+    public long getOriginalSizeBytes(){ return originalSizeBytes; }
+    public String getSha256Hex(){ return sha256Hex; }
+    public byte[] getPayload(){ return payload; }
 }

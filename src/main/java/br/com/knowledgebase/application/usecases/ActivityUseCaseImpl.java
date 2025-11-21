@@ -92,6 +92,23 @@ public class ActivityUseCaseImpl implements ActivityUseCase {
                 .toList();
     }
 
+    @Override
+    public List<String> listarTags(List<String> excessao) {
+        final var excNorm = toNormalizedSet(excessao);
+
+        return repo.findDistinctTags().stream()
+                .filter(Objects::nonNull)
+                .map(String::strip)
+                .filter(Predicate.not(String::isBlank))
+                .filter(cat -> {
+                    String norm = ActivityFilterParams.normalize(cat);
+                    return excNorm.isEmpty() || !excNorm.contains(norm);
+                })
+                .distinct()
+                .sorted(String.CASE_INSENSITIVE_ORDER)
+                .toList();
+    }
+
     private Set<String> toNormalizedSet(List<String> items) {
         if (items == null) return Set.of();
         return items.stream()

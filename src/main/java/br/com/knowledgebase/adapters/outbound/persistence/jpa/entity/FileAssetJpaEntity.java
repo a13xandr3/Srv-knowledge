@@ -14,20 +14,20 @@ public class FileAssetJpaEntity {
     @Column(name="filename", nullable=false, length=255)
     private String filename;
 
-    @Column(name="mime_type", length=255)
+    @Column(name="mimeType", length=255)
     private String mimeType;
 
-    @Column(name="content_encoding", nullable = false, length = 16)
+    @Column(name="contentEncoding",  nullable = false, length = 16)
     private String contentEncoding;
 
-    @Column(name="sha256_hex", nullable = false, unique = true, length=64)
-    private String sha256Hex;
+    @Column(name="gzipSizeBytes")
+    private Long gzipSizeBytes;
 
-    @Column(name="original_size_bytes", nullable = false)
+    @Column(name="originalSizeBytes", nullable = false)
     private Long originalSizeBytes;
 
-    @Column(name="gzip_size_bytes")
-    private Long gzipSizeBytes;
+    @Column(name="sha256Hex", nullable = false, unique = true, length=64)
+    private String sha256Hex;
 
     @Lob
     @Basic(fetch = FetchType.LAZY)

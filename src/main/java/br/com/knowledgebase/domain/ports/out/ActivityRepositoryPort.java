@@ -16,4 +16,10 @@ public interface ActivityRepositoryPort {
      * A infraestrutura decide a melhor forma de implementar (JPQL, SQL nativo, etc.).
      */
     List<String> findDistinctCategorias();
+
+    /**
+     * Retorna todas as categorias distintas existentes na tabela/link/Activity.
+     * A infraestrutura decide a melhor forma de implementar (JPQL, SQL nativo, etc.).
+     */
+    List<String> findDistinctTags();
 }

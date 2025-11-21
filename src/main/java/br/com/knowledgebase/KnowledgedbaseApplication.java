@@ -13,4 +13,5 @@ public class KnowledgedbaseApplication {
         SpringApplication.run(KnowledgedbaseApplication.class, args);
 
     }
+
 }

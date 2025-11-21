@@ -5,8 +5,14 @@ import br.com.knowledgebase.domain.model.FileAsset;
 import java.util.List;
 import java.util.Optional;
 
+import br.com.knowledgebase.domain.model.FileAsset;
+
+import java.util.List;
+import java.util.Optional;
+
 public interface FileRepositoryPort {
-    FileAsset save(FileAsset f);
+    Long saveUpload(FileAsset file);
     Optional<FileAsset> findById(Long id);
-    List<FileAsset> list(int page, int size);
+    void deleteById(Long id);
+    List<FileAsset> findAllByIds(List<Long> ids);
 }

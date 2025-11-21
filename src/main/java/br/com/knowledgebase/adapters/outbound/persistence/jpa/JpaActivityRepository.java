@@ -27,4 +27,8 @@ public interface JpaActivityRepository extends JpaRepository<ActivityJpaEntity, 
 
     @Query("select distinct a.categoria from ActivityJpaEntity a")
     List<String> findDistinctCategorias();
+
+    @Query("select distinct a.tag from ActivityJpaEntity a")
+    List<String> findDistinctTags();
+
 }
