@@ -1,6 +1,7 @@
 package br.com.knowledgebase.adapters.outbound.persistence.jpa;
 
 import br.com.knowledgebase.adapters.outbound.persistence.jpa.entity.UserJpaEntity;
+
 import org.springframework.data.jpa.repository.*;
 import org.springframework.data.repository.query.Param;
 

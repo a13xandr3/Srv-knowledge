@@ -4,6 +4,7 @@ import br.com.knowledgebase.domain.ports.in.LoginUseCase;
 import br.com.knowledgebase.domain.ports.in.TwoFactorVerifyUseCase;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.media.Content;

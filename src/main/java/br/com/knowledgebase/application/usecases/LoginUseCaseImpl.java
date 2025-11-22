@@ -3,6 +3,7 @@ package br.com.knowledgebase.application.usecases;
 import br.com.knowledgebase.domain.ports.in.LoginUseCase;
 import br.com.knowledgebase.domain.ports.out.TokenProviderPort;
 import br.com.knowledgebase.domain.ports.out.UserRepositoryPort;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 

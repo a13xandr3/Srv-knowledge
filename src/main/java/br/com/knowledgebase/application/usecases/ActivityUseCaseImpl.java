@@ -2,11 +2,11 @@ package br.com.knowledgebase.application.usecases;
 
 import br.com.knowledgebase.domain.ports.in.ActivityFilterParams;
 import br.com.knowledgebase.domain.ports.in.ActivityPageResult;
-import org.springframework.stereotype.Service;
-
 import br.com.knowledgebase.domain.model.Activity;
 import br.com.knowledgebase.domain.ports.in.ActivityUseCase;
 import br.com.knowledgebase.domain.ports.out.ActivityRepositoryPort;
+
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.*;

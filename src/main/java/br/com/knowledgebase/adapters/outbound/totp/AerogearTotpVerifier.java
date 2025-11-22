@@ -1,6 +1,7 @@
 package br.com.knowledgebase.adapters.outbound.totp;
 
 import br.com.knowledgebase.domain.ports.out.TotpVerifierPort;
+
 import org.jboss.aerogear.security.otp.Totp;
 import org.springframework.stereotype.Component;
 

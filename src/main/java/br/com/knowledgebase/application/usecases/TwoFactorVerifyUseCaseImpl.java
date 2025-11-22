@@ -4,6 +4,7 @@ import br.com.knowledgebase.domain.ports.in.TwoFactorVerifyUseCase;
 import br.com.knowledgebase.domain.ports.out.TokenProviderPort;
 import br.com.knowledgebase.domain.ports.out.TwoFactorServicePort;
 import br.com.knowledgebase.domain.ports.out.UserRepositoryPort;
+
 import org.springframework.stereotype.Service;
 
 @Service

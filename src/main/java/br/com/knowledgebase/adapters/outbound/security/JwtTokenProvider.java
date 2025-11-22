@@ -1,12 +1,16 @@
 package br.com.knowledgebase.adapters.outbound.security;
 
 import br.com.knowledgebase.domain.ports.out.TokenProviderPort;
+
 import javax.crypto.SecretKey;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+
 import java.nio.charset.StandardCharsets;
+
 import jakarta.annotation.PostConstruct;
+
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;

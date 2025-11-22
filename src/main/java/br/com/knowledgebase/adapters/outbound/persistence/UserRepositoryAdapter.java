@@ -4,6 +4,7 @@ import br.com.knowledgebase.adapters.outbound.persistence.jpa.JpaUserRepository;
 import br.com.knowledgebase.adapters.outbound.persistence.jpa.mapper.UserMapper;
 import br.com.knowledgebase.domain.model.User;
 import br.com.knowledgebase.domain.ports.out.UserRepositoryPort;
+
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 

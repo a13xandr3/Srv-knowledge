@@ -5,6 +5,7 @@ import br.com.knowledgebase.adapters.outbound.persistence.jpa.entity.FileAssetJp
 import br.com.knowledgebase.domain.model.ContentEncoding;
 import br.com.knowledgebase.domain.model.FileAsset;
 import br.com.knowledgebase.domain.ports.out.FileRepositoryPort;
+
 import org.springframework.stereotype.Repository;
 
 import java.util.List;

@@ -1,11 +1,14 @@
 package br.com.knowledgebase.adapters.outbound.totp;
 
 import br.com.knowledgebase.domain.ports.out.TwoFactorServicePort;
+
 import com.eatthepath.otp.TimeBasedOneTimePasswordGenerator;
+
 import org.apache.commons.codec.binary.Base32;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.spec.SecretKeySpec;
+
 import java.security.Key;
 import java.time.Duration;
 import java.time.Instant;

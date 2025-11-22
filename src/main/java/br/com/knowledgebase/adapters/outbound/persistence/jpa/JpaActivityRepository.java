@@ -1,6 +1,7 @@
 package br.com.knowledgebase.adapters.outbound.persistence.jpa;
 
 import br.com.knowledgebase.adapters.outbound.persistence.jpa.entity.ActivityJpaEntity;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

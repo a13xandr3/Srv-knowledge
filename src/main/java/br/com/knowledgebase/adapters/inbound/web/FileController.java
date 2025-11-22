@@ -97,7 +97,7 @@ public class FileController {
         return ResponseEntity.ok(new FileSavedResponse(res.id(), res.hashSha256Hex()));
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/delete/{id}")
     @Operation(summary = "Excluir arquivo")
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "Excluído"),

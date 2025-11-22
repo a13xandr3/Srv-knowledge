@@ -2,6 +2,7 @@ package br.com.knowledgebase.adapters.outbound.totp;
 
 import br.com.knowledgebase.adapters.outbound.security.TotpUtil;
 import br.com.knowledgebase.domain.ports.out.TotpProvisioningPort;
+
 import org.springframework.stereotype.Component;
 
 @Component

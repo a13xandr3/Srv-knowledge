@@ -5,8 +5,9 @@ import br.com.knowledgebase.adapters.outbound.persistence.jpa.mapper.ActivityMap
 import br.com.knowledgebase.domain.model.Activity;
 import br.com.knowledgebase.domain.model.TagWrapper;
 import br.com.knowledgebase.domain.ports.out.ActivityRepositoryPort;
-import com.fasterxml.jackson.core.type.TypeReference;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;

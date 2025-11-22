@@ -6,12 +6,11 @@ import br.com.knowledgebase.domain.exception.FileNotFoundException;
 import br.com.knowledgebase.domain.model.ContentEncoding;
 import br.com.knowledgebase.domain.model.FileAsset;
 import br.com.knowledgebase.domain.model.Snapshot;
+import static br.com.knowledgebase.domain.service.CompressionService.*;
+
 import org.springframework.stereotype.Service;
 
-import java.nio.charset.StandardCharsets;
 import java.util.*;
-
-import static br.com.knowledgebase.domain.service.CompressionService.*;
 
 @Service
 public class FileService implements

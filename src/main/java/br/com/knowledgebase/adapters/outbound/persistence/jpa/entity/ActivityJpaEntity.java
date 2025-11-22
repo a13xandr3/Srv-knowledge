@@ -3,11 +3,10 @@ package br.com.knowledgebase.adapters.outbound.persistence.jpa.entity;
 import br.com.knowledgebase.adapters.outbound.persistence.jpa.converter.JsonMapConverter;
 
 import jakarta.persistence.*;
+import static jakarta.persistence.GenerationType.IDENTITY;
 
 import java.time.LocalDateTime;
 import java.util.Map;
-
-import static jakarta.persistence.GenerationType.IDENTITY;
 
 @Entity
 @Table(name = "link", indexes = {

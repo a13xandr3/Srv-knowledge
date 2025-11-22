@@ -1,6 +1,7 @@
 package br.com.knowledgebase.adapters.outbound.persistence.jpa.entity;
 
 import jakarta.persistence.*;
+
 import java.time.LocalDateTime;
 
 @Entity

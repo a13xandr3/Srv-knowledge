@@ -8,5 +8,5 @@ public record Snapshot(
         Long gzipSizeBytes,
         long originalSizeBytes,
         String sha256Hex,
-        String base64 // pode ser null
+        String base64
 ) {}
