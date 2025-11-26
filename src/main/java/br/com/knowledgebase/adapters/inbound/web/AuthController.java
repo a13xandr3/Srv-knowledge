@@ -1,5 +1,6 @@
 package br.com.knowledgebase.adapters.inbound.web;
 
+import br.com.knowledgebase.adapters.outbound.security.JwtTokenProvider;
 import br.com.knowledgebase.domain.ports.in.LoginUseCase;
 import br.com.knowledgebase.domain.ports.in.TwoFactorVerifyUseCase;
 
@@ -20,6 +21,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/auth")
 @Tag(name = "Auth", description = "Autenticação via usuário/senha e verificação 2FA (TOTP)")
@@ -27,11 +30,14 @@ public class AuthController {
 
     private final LoginUseCase loginUseCase;
     private final TwoFactorVerifyUseCase twoFactorVerifyUseCase;
+    private final JwtTokenProvider jwtTokenProvider;
 
     public AuthController(LoginUseCase loginUseCase,
-                          TwoFactorVerifyUseCase twoFactorVerifyUseCase) {
+                          TwoFactorVerifyUseCase twoFactorVerifyUseCase,
+                          JwtTokenProvider jwtTokenProvider) {
         this.loginUseCase = loginUseCase;
         this.twoFactorVerifyUseCase = twoFactorVerifyUseCase;
+        this.jwtTokenProvider = jwtTokenProvider;
     }
 
     @PostMapping(
@@ -54,9 +60,7 @@ public class AuthController {
             @ApiResponse(responseCode = "401", description = "Credenciais inválidas"),
             @ApiResponse(responseCode = "500", description = "Erro interno")
     })
-    public ResponseEntity<LoginResponse> login(
-            @Valid @RequestBody LoginRequest req
-    ) {
+    public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest req) {
         // 1) Valida usuário/senha
         LoginUseCase.Result res = loginUseCase.login(req.username(), req.password());
 
@@ -94,6 +98,27 @@ public class AuthController {
     public ResponseEntity<LoginResponse> verify(@Valid @RequestBody TwoFactorVerifyRequest req) {
         String jwt = twoFactorVerifyUseCase.verify(req.username(), req.code());
         return ResponseEntity.ok(new LoginResponse("OK", jwt));
+    }
+
+    @PostMapping(
+            path = "/revalidate",
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    @Operation(summary = "Revalida um token ainda válido e emite um novo")
+    public ResponseEntity<?> revalidate(@RequestBody Map<String, String> body) {
+        String oldToken = body.getOrDefault("token", "");
+        if (!jwtTokenProvider.validate(oldToken)) {
+            return ResponseEntity.status(401).build();
+        }
+
+        long msLeft = jwtTokenProvider.millisToExpire(oldToken);
+        if (msLeft <= 60_000 && msLeft > 0) {
+            String username = jwtTokenProvider.subject(oldToken);
+            String newToken = jwtTokenProvider.generate(username);
+            return ResponseEntity.ok(Map.of("token", newToken));
+        }
+        return ResponseEntity.noContent().build();
     }
 
     // ---------------- DTOs ----------------
