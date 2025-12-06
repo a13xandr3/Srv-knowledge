@@ -24,6 +24,7 @@ spring:
     multipart:
       max-file-size: 500MB
       max-request-size: 500MB
+      resolve-lazily: true       # lança exception só ao acessar o arquivo
   sql:
     init:
       mode: always
@@ -50,7 +51,8 @@ security:
     issuer: knowledgebase
     secret: ${JWT_SECRET}
     base64: false
-    expiration-seconds: 3600
+    expirationSeconds: 3600
+    refreshExpirationSeconds: 604800
 
   service-token:
     issuer: bff-knowledgebase

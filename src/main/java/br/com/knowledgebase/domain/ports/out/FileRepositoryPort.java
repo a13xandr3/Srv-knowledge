@@ -8,6 +8,7 @@ import java.util.Optional;
 public interface FileRepositoryPort {
     Long saveUpload(FileAsset file);
     Optional<FileAsset> findById(Long id);
+    boolean existsById(Long id);
     void deleteById(Long id);
     List<FileAsset> findAllByIds(List<Long> ids);
 }

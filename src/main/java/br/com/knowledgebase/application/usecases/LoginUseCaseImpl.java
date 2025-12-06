@@ -3,7 +3,8 @@ package br.com.knowledgebase.application.usecases;
 import br.com.knowledgebase.domain.ports.in.LoginUseCase;
 import br.com.knowledgebase.domain.ports.out.TokenProviderPort;
 import br.com.knowledgebase.domain.ports.out.UserRepositoryPort;
-
+import br.com.knowledgebase.domain.model.User;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -24,28 +25,25 @@ public class LoginUseCaseImpl implements LoginUseCase {
 
     @Override
     public Result login(String username, String password) {
+        // 1) busca usuário pelo port EXISTENTE
+        User user = userRepo.findByUsername(username)
+                .orElseThrow(() -> new BadCredentialsException("Invalid credentials"));
 
-        var user = userRepo.findByUsername(username)
-                .orElseThrow(() -> new IllegalArgumentException("Credenciais inválidas"));
-
-        final String raw = password == null ? "" : password;
-        final String stored = user.getPasswordHash() == null ? "" : user.getPasswordHash().trim();
-
-        // sanity check do formato BCrypt para evitar mensagens confusas
-        if (stored.length() < 60 || !(stored.startsWith("$2a$") || stored.startsWith("$2b$") || stored.startsWith("$2y$"))) {
-            throw new IllegalStateException("Hash BCrypt inválido/ausente para o usuário: " + user.getUsername());
+        // 2) valida senha (raw x encoded)
+        String encoded = user.getPasswordHash(); // seu modelo expõe passwordHash
+        if (!passwordEncoder.matches(password, encoded)) {
+            throw new BadCredentialsException("Invalid credentials");
         }
 
-        if (!passwordEncoder.matches(raw, stored)) {
-            throw new IllegalArgumentException("Credenciais inválidas");
-        }
-
+        // 3) se 2FA estiver habilitado, apenas sinaliza necessidade do TOTP
         if (user.isTwoFaEnabled()) {
-            // NÃO envie o TOTP aqui — apenas sinalize que precisa do segundo fator
-            return new Result(Decision.TWO_FA_REQUIRED, null);
+            return new Result(Decision.TWO_FA_REQUIRED, null, user.getUsername());
         }
 
-        String jwt = tokenProvider.generate(user.getUsername());
-        return new Result(Decision.OK, jwt);
+        // 4) gera access token pelo PORT (hexagonal)
+        String subject = user.getUsername(); // username canônico
+        String jwt = tokenProvider.generate(subject);
+
+        return new Result(Decision.OK, jwt, subject);
     }
 }

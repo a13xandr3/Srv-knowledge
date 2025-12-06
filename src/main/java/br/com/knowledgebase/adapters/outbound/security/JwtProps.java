@@ -14,6 +14,7 @@ public class JwtProps {
     @NotBlank private String secret;
     @NotNull  private Boolean base64;
     @NotNull  private Long expirationSeconds;
+    @NotNull  private Long refreshExpirationSeconds;
 
     public String getIssuer() {
         return issuer;
@@ -46,4 +47,8 @@ public class JwtProps {
     public void setExpirationSeconds(long expirationSeconds) {
         this.expirationSeconds = expirationSeconds;
     }
+
+    public long getRefreshExpirationSeconds() { return refreshExpirationSeconds; }
+
+    public void setRefreshExpirationSeconds(long refreshExpirationSeconds ) { this.refreshExpirationSeconds = refreshExpirationSeconds; }
 }

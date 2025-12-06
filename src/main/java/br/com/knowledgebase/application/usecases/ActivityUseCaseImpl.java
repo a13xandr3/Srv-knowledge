@@ -1,12 +1,15 @@
 package br.com.knowledgebase.application.usecases;
 
+import br.com.knowledgebase.domain.exception.ResourceNotFoundException;
 import br.com.knowledgebase.domain.ports.in.ActivityFilterParams;
 import br.com.knowledgebase.domain.ports.in.ActivityPageResult;
 import br.com.knowledgebase.domain.model.Activity;
 import br.com.knowledgebase.domain.ports.in.ActivityUseCase;
 import br.com.knowledgebase.domain.ports.out.ActivityRepositoryPort;
 
+import br.com.knowledgebase.domain.ports.out.FileRepositoryPort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -17,9 +20,11 @@ import java.util.stream.Collectors;
 public class ActivityUseCaseImpl implements ActivityUseCase {
 
     private final ActivityRepositoryPort repo;
+    private final FileRepositoryPort fileRepo;
 
-    public ActivityUseCaseImpl(ActivityRepositoryPort repo) {
+    public ActivityUseCaseImpl(ActivityRepositoryPort repo, FileRepositoryPort fileRepo) {
         this.repo = repo;
+        this.fileRepo = fileRepo;
     }
 
     @Override
@@ -39,6 +44,38 @@ public class ActivityUseCaseImpl implements ActivityUseCase {
             exist.updateFrom(a, now);
             return repo.save(exist);
         }).orElseThrow(() -> new NoSuchElementException("Atividade não encontrada"));
+    }
+
+    /**
+     * Tudo-ou-nada:
+     * - Se link NÃO existe => 404, nada é removido
+     * - Se file NÃO existe => 404, nada é removido
+     * - (opcional) Valida relacionamento link->file se seu modelo expõe essa info
+     */
+    @Transactional
+    @Override
+    public void deleteLinkAndFiles(Long linkId, List<Long> fileIds) {
+        if (!repo.existsById(linkId)) {
+            throw new ResourceNotFoundException("Link não encontrado: " + linkId);
+        }
+        if (fileIds != null) {
+            for (Long fid : fileIds) {
+                if (fid == null) continue;
+                if (!fileRepo.existsById(fid)) {
+                    throw new ResourceNotFoundException("File não encontrado: " + fid);
+                }
+            }
+        }
+
+        // Ordem já utilizada no projeto: primeiro o Link, depois os Files (rollback se falhar)
+        repo.deleteById(linkId);
+
+        if (fileIds != null) {
+            for (Long fid : fileIds) {
+                if (fid == null) continue;
+                fileRepo.deleteById(fid);
+            }
+        }
     }
 
     @Override

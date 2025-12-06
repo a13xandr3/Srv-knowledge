@@ -15,4 +15,5 @@ public interface ActivityUseCase {
     ActivityPageResult listWithFilters(ActivityFilterParams filterParams, int page, int size);
     List<String> listarCategorias(List<String> excessao);
     List<String> listarTags(List<String> excessao);
+    void deleteLinkAndFiles(Long linkId, java.util.List<Long> fileIds);
 }

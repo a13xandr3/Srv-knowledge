@@ -19,8 +19,14 @@ import jakarta.validation.constraints.Pattern;
 
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
+
 import org.springframework.web.bind.annotation.*;
 
+import java.security.SecureRandom;
+import java.time.Duration;
+import java.util.Base64;
 import java.util.Map;
 
 @RestController
@@ -31,6 +37,9 @@ public class AuthController {
     private final LoginUseCase loginUseCase;
     private final TwoFactorVerifyUseCase twoFactorVerifyUseCase;
     private final JwtTokenProvider jwtTokenProvider;
+
+    // Gerador seguro p/ refresh tokens (string aleatória url-safe)
+    private static final SecureRandom RNG = new SecureRandom();
 
     public AuthController(LoginUseCase loginUseCase,
                           TwoFactorVerifyUseCase twoFactorVerifyUseCase,
@@ -50,7 +59,7 @@ public class AuthController {
             description = """
             Valida usuário/senha (BCrypt).
             • Se 2FA estiver habilitado e o TOTP NÃO for enviado, retorna status="2FA_REQUIRED".
-            • Se TOTP for enviado e válido (ou se 2FA não estiver habilitado), retorna status="OK" e o token JWT.
+            • Se TOTP for enviado e válido (ou se 2FA não estiver habilitado), retorna status="OK", o JWT (access token) e define um cookie HttpOnly com o refresh token.
             """
     )
     @ApiResponses({
@@ -64,9 +73,10 @@ public class AuthController {
         // 1) Valida usuário/senha
         LoginUseCase.Result res = loginUseCase.login(req.username(), req.password());
 
-        // 2) Se não há 2FA, devolve o JWT direto
+        // 2) Se não há 2FA, devolve access token e seta refresh cookie
         if (res.decision() == LoginUseCase.Decision.OK) {
-            return ResponseEntity.ok(new LoginResponse("OK", res.token()));
+            String accessToken = res.token(); // vindo do caso de uso
+            return issueTokensAndSetCookie(res.username(), accessToken);
         }
 
         // 3) Há 2FA habilitado: se TOTP não veio, sinaliza necessidade
@@ -74,9 +84,9 @@ public class AuthController {
             return ResponseEntity.ok(new LoginResponse("2FA_REQUIRED", null));
         }
 
-        // 4) TOTP informado: verifica e retorna JWT em caso de sucesso
-        String jwt = twoFactorVerifyUseCase.verify(req.username(), req.totp().trim());
-        return ResponseEntity.ok(new LoginResponse("OK", jwt));
+        // 4) TOTP informado: verifica e retorna access token + refresh cookie
+        String accessToken = twoFactorVerifyUseCase.verify(req.username(), req.totp().trim());
+        return issueTokensAndSetCookie(req.username(), accessToken);
     }
 
     @PostMapping(
@@ -86,7 +96,7 @@ public class AuthController {
     )
     @Operation(
             summary = "Verifica TOTP",
-            description = "Valida o código TOTP e retorna um JWT em caso de sucesso."
+            description = "Valida o código TOTP e retorna um JWT (access token) + define refresh token via cookie."
     )
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK",
@@ -96,8 +106,8 @@ public class AuthController {
             @ApiResponse(responseCode = "500", description = "Erro interno")
     })
     public ResponseEntity<LoginResponse> verify(@Valid @RequestBody TwoFactorVerifyRequest req) {
-        String jwt = twoFactorVerifyUseCase.verify(req.username(), req.code());
-        return ResponseEntity.ok(new LoginResponse("OK", jwt));
+        String accessToken = twoFactorVerifyUseCase.verify(req.username(), req.code());
+        return issueTokensAndSetCookie(req.username(), accessToken);
     }
 
     @PostMapping(
@@ -105,7 +115,7 @@ public class AuthController {
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    @Operation(summary = "Revalida um token ainda válido e emite um novo")
+    @Operation(summary = "Revalida um token ainda válido e emite um novo (apenas na janela final de 60s)")
     public ResponseEntity<?> revalidate(@RequestBody Map<String, String> body) {
         String oldToken = body.getOrDefault("token", "");
         if (!jwtTokenProvider.validate(oldToken)) {
@@ -116,9 +126,41 @@ public class AuthController {
         if (msLeft <= 60_000 && msLeft > 0) {
             String username = jwtTokenProvider.subject(oldToken);
             String newToken = jwtTokenProvider.generate(username);
+            // Mantemos o refresh cookie como está; a troca/rotação é feita em endpoint dedicado (quando existir).
             return ResponseEntity.ok(Map.of("token", newToken));
         }
         return ResponseEntity.noContent().build();
+    }
+
+    // ===== Helpers =====
+
+    /**
+     * Emite/atualiza o refresh cookie (apenas emissão; validação/rotação ficam para um endpoint futuro)
+     * e devolve o access token no corpo.
+     */
+    private ResponseEntity<LoginResponse> issueTokensAndSetCookie(String username, String accessToken) {
+        String refresh = generateRefreshToken();
+
+        // Em dev: secure(false), sameSite("Lax").
+        // Em produção (HTTPS e possivelmente domínios distintos): secure(true), sameSite("None") e ajustar 'domain' se necessário.
+        ResponseCookie cookie = ResponseCookie.from("refresh_token", refresh)
+                .httpOnly(true)
+                .secure(false)               // PRODUÇÃO: true
+                .sameSite("Lax")             // Cross-site + HTTPS => "None"
+                .path("/api/auth")
+                .maxAge(Duration.ofDays(7))  // ou parametrizar via properties
+                .build();
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                .body(new LoginResponse("OK", accessToken));
+    }
+
+    private static String generateRefreshToken() {
+        byte[] buf = new byte[32];
+        RNG.nextBytes(buf);
+        // URL-safe, sem padding
+        return Base64.getUrlEncoder().withoutPadding().encodeToString(buf);
     }
 
     // ---------------- DTOs ----------------

@@ -26,6 +26,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Map;
 
 @Validated
 @RestController
@@ -105,6 +106,13 @@ public class ActivitiesController {
         return ResponseEntity.ok(updated);
     }
 
+    @PostMapping("/delete")
+    @Operation(summary = "Exclui Link e Files de forma atômica")
+    public ResponseEntity<Void> deleteComposite(@RequestBody DeleteCompositeRequest body) {
+        activityUseCase.deleteLinkAndFiles(body.linkId(), body.fileIds());
+        return ResponseEntity.noContent().build(); // 204
+    }
+
     @DeleteMapping("/{id}")
     @Operation(summary = "Remove atividade")
     @ApiResponses({
@@ -143,4 +151,7 @@ public class ActivitiesController {
         List<String> tags = activityUseCase.listarTags(excessao);
         return ResponseEntity.ok(tags);
     }
+
+    public record DeleteCompositeRequest(Long linkId, java.util.List<Long> fileIds) {}
+
 }
