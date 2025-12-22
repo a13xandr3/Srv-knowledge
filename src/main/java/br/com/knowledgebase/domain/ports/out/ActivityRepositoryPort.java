@@ -1,6 +1,9 @@
 package br.com.knowledgebase.domain.ports.out;
 
 import br.com.knowledgebase.domain.model.Activity;
+import br.com.knowledgebase.domain.ports.in.ActivityFilterParams;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
@@ -23,4 +26,7 @@ public interface ActivityRepositoryPort {
      * A infraestrutura decide a melhor forma de implementar (JPQL, SQL nativo, etc.).
      */
     List<String> findDistinctTags();
+
+    Page<Activity> findWithFilters(ActivityFilterParams filterParams, Pageable pageable);
+
 }

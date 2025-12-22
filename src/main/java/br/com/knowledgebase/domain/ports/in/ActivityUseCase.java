@@ -12,7 +12,9 @@ public interface ActivityUseCase {
     void delete(Long id);
     List<Activity> list(int page, int size);
     List<Activity> search(String term, int page, int size);
+
     ActivityPageResult listWithFilters(ActivityFilterParams filterParams, int page, int size);
+
     List<String> listarCategorias(List<String> excessao);
     List<String> listarTags(List<String> excessao);
     void deleteLinkAndFiles(Long linkId, java.util.List<Long> fileIds);

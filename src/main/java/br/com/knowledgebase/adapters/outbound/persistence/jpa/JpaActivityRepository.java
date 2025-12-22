@@ -15,15 +15,16 @@ import java.util.List;
 public interface JpaActivityRepository extends JpaRepository<ActivityJpaEntity, Long> {
 
     @Query("""
-    select e from ActivityJpaEntity e
-    where (:term is null or :term = ''
-       or lower(e.name)       like lower(concat('%', :term, '%'))
-       or lower(e.categoria)    like lower(concat('%', :term, '%'))
-       or lower(e.subCategoria) like lower(concat('%', :term, '%'))
-       or lower(e.descricao)    like lower(concat('%', :term, '%'))
-    )
-  """)
-
+            select e
+            from ActivityJpaEntity e
+            where
+                (:term is null or :term = '' or
+                 lower(e.name) like lower(concat('%', :term, '%')) or
+                 lower(e.categoria) like lower(concat('%', :term, '%')) or
+                 lower(e.subCategoria) like lower(concat('%', :term, '%')) or
+                 lower(e.descricao) like lower(concat('%', :term, '%'))
+                )
+            """)
     Page<ActivityJpaEntity> search(@Param("term") String term, Pageable pageable);
 
     @Query("select distinct a.categoria from ActivityJpaEntity a")
@@ -31,5 +32,4 @@ public interface JpaActivityRepository extends JpaRepository<ActivityJpaEntity, 
 
     @Query("select distinct a.tag from ActivityJpaEntity a")
     List<String> findDistinctTags();
-
 }

@@ -6,7 +6,7 @@ import java.util.List;
 
 public record ActivityPageResult(
         List<Activity> activities,
-        int total,
+        long total,
         int page,
         int size
 ) {}

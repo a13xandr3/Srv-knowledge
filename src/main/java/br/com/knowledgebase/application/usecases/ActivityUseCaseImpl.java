@@ -8,7 +8,13 @@ import br.com.knowledgebase.domain.ports.in.ActivityUseCase;
 import br.com.knowledgebase.domain.ports.out.ActivityRepositoryPort;
 
 import br.com.knowledgebase.domain.ports.out.FileRepositoryPort;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
@@ -95,20 +101,29 @@ public class ActivityUseCaseImpl implements ActivityUseCase {
 
     @Override
     public ActivityPageResult listWithFilters(ActivityFilterParams filterParams, int page, int size) {
+        int safePage = Math.max(page, 0);
+        int safeSize = Math.max(size, 1);
 
-        // ponto único para colocar sua REGRA de filtro/paginação
-        // por enquanto, exemplo simples delegando para list(...)
-        // depois você pode encaixar aqui a mesma lógica que estava no controller.
+        Pageable pageable = PageRequest.of(
+                safePage,
+                safeSize,
+                Sort.by("createdAt").descending()
+        );
 
-        List<Activity> activities = list(page, size);
+        Page<Activity> pageResult = repo.findWithFilters(
+                filterParams,
+                pageable
+        );
 
-        int total = activities.size(); // ou use o count do repositório, se tiver
+        List<Activity> activities = pageResult.getContent();
+
+        long total = pageResult.getTotalElements();  // total real de registros filtrados no banco
 
         return new ActivityPageResult(
                 activities,
                 total,
-                page,
-                size
+                pageResult.getNumber(),
+                pageResult.getSize()
         );
     }
 

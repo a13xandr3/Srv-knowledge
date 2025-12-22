@@ -48,20 +48,27 @@ public class ActivitiesController {
                     content = @Content(schema = @Schema(implementation = ActivityPageResponse.class)))
     })
     public ResponseEntity<ActivityPageResponse> getAllAtividades(
-            @Parameter(description = "Página (0-based)") @RequestParam(defaultValue = "0") @Min(0) int page,
-            @Parameter(description = "Tamanho da página (1..100)") @RequestParam(defaultValue = "10") @Min(1) @Max(100) int limit,
-            @Parameter(description = "Categorias a excluir") @RequestParam(name = "excessao", required = false) List<String> excessao,
-            @Parameter(description = "Categorias para incluir") @RequestParam(name = "categoria", required = false) List<String> categoria,
-            @Parameter(description = "Tags para incluir") @RequestParam(name = "tag", required = false) List<String> tag,
-            @Parameter(description = "Termo de busca em categoria") @RequestParam(name = "categoriaTerm", required = false) String categoriaTerm
+            @RequestParam(defaultValue = "0") @Min(0) int page,
+            @RequestParam(defaultValue = "10") @Min(1) @Max(100) int limit,
+            @RequestParam(name = "excessao", required = false) List<String> excessao,
+            @RequestParam(name = "categoria", required = false) List<String> categoria,
+            @RequestParam(name = "tag", required = false) List<String> tag,
+            @RequestParam(name = "categoriaTerm", required = false) String categoriaTerm
     ) {
         ActivityFilterParams filterParams = new ActivityFilterParams(
                 excessao, categoria, tag, categoriaTerm
         );
         ActivityPageResult result = activityUseCase.listWithFilters(filterParams, page, limit);
+
+        // Aqui NÃO tem mapper e NÃO tem ActivityResponse.
+        // Usamos diretamente o que o use case devolve.
         ActivityPageResponse body = new ActivityPageResponse(
-                result.activities(), result.total(), result.page(), result.size()
+                result.activities(),  // tipo já compatível com o que ActivityPageResponse espera
+                result.total(),
+                result.page(),
+                result.size()
         );
+
         return ResponseEntity.ok(body);
     }
 

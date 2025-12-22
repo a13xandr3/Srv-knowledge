@@ -6,6 +6,8 @@ import br.com.knowledgebase.domain.ports.in.TwoFactorVerifyUseCase;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -48,6 +50,9 @@ public class AuthController {
         this.twoFactorVerifyUseCase = twoFactorVerifyUseCase;
         this.jwtTokenProvider = jwtTokenProvider;
     }
+
+    public record RevalidateRequest(String token) {}
+    public record RevalidateResponse(String token) {}
 
     @PostMapping(
             path = "/login",
@@ -115,22 +120,117 @@ public class AuthController {
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    @Operation(summary = "Revalida um token ainda válido e emite um novo (apenas na janela final de 60s)")
-    public ResponseEntity<?> revalidate(@RequestBody Map<String, String> body) {
-        String oldToken = body.getOrDefault("token", "");
+    public ResponseEntity<RevalidateResponse> revalidate(@RequestBody RevalidateRequest body) {
+
+        String oldToken = (body == null ? null : body.token());
+        if (oldToken == null || oldToken.isBlank()) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        final long windowMs = 60_000L;
+
+        final Claims claims;
+        try {
+            // PONTO DO AJUSTE: não usar validate() aqui (ele bloqueia expirado).
+            // Aqui precisamos apenas garantir assinatura/issuer e então aplicar a janela de 60s.
+            claims = jwtTokenProvider.parseClaimsAllowExpired(oldToken);
+        } catch (JwtException | IllegalArgumentException e) {
+            return ResponseEntity.status(401).build();
+        }
+
+        long deltaMs = claims.getExpiration().getTime() - System.currentTimeMillis();
+
+        // cedo demais (ainda falta > 60s)
+        if (deltaMs > windowMs) {
+            return ResponseEntity.noContent().build();
+        }
+
+        // tarde demais (expirou há mais de 60s) => força login
+        if (deltaMs < -windowMs) {
+            return ResponseEntity.status(401).build();
+        }
+
+        // dentro da janela: faltando <= 60s OU expirou há <= 60s => revalida
+        String newToken = jwtTokenProvider.generate(claims.getSubject());
+        return ResponseEntity.ok(new RevalidateResponse(newToken));
+    }
+    /*
+    @PostMapping(
+            path = "/revalidate",
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    @Operation(summary = "Revalida um token ainda válido e emite um novo (apenas nos últimos 60s antes de expirar)")
+    public ResponseEntity<RevalidateResponse> revalidate(@RequestBody RevalidateRequest body) {
+
+        // 1) Recupera e valida presença
+        String oldToken = (body == null ? null : body.token());
+        if (oldToken == null || oldToken.isBlank()) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        final long windowMs = 60_000L;
+        // final long windowMs = Duration.ofSeconds(60).toMillis();
+
+        // 2) Validação estrita: assinatura + issuer + expiração (ANTES de expirar)
+        // FIX: agora é coerente com a expectativa "antes de expirar"
         if (!jwtTokenProvider.validate(oldToken)) {
             return ResponseEntity.status(401).build();
         }
 
+        // 3) Calcula ms restantes com base no provider (coerente e normalizado)
+        long msLeft = jwtTokenProvider.millisToExpire(oldToken);
+
+        // Segurança defensiva: mesmo validado, pode ter expirado entre as chamadas
+        if (msLeft <= 0) {
+            return ResponseEntity.status(401).build();
+        }
+
+        // 4) Fora da janela final: não revalida
+        if (msLeft > windowMs) {
+            return ResponseEntity.noContent().build(); // 204
+        }
+
+        // 5) Dentro dos últimos 60s: emite novo token
+        String username = jwtTokenProvider.subject(oldToken);
+        String newToken = jwtTokenProvider.generate(username);
+
+        return ResponseEntity.ok(new RevalidateResponse(newToken));
+    }
+    */
+    /*
+    public ResponseEntity<?> revalidate(@RequestBody Map<String, String> body) {
+        // 1) Recupera o token do body
+        String oldToken = body.get("token");
+        if (oldToken == null || oldToken.isBlank()) {
+            // requisição mal formada (sem token)
+            return ResponseEntity.badRequest().build();
+        }
+
+        // 2) Normaliza: remove prefixo "Bearer " se vier assim do front/BFF
+        oldToken = oldToken.trim();
+        if (oldToken.toLowerCase().startsWith("bearer ")) {
+            oldToken = oldToken.substring(7).trim();
+        }
+
+        // 3) Valida assinatura, formato e expiração
+        if (!jwtTokenProvider.validate(oldToken)) {
+            return ResponseEntity.status(401).build();
+        }
+
+        // 4) Verifica janela final de 60s
         long msLeft = jwtTokenProvider.millisToExpire(oldToken);
         if (msLeft <= 60_000 && msLeft > 0) {
             String username = jwtTokenProvider.subject(oldToken);
             String newToken = jwtTokenProvider.generate(username);
-            // Mantemos o refresh cookie como está; a troca/rotação é feita em endpoint dedicado (quando existir).
+            // Mantém o refresh cookie como está; apenas troca o access token
             return ResponseEntity.ok(Map.of("token", newToken));
         }
+
+        // Token ainda não está na janela de renovação: 204 (sem corpo)
         return ResponseEntity.noContent().build();
     }
+    */
 
     // ===== Helpers =====
 
