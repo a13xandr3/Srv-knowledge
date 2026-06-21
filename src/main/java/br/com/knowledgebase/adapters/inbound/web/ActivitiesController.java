@@ -25,8 +25,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
+import java.util.stream.Stream;
 
 @Validated
 @RestController
@@ -56,7 +57,10 @@ public class ActivitiesController {
             @RequestParam(name = "categoriaTerm", required = false) String categoriaTerm
     ) {
         ActivityFilterParams filterParams = new ActivityFilterParams(
-                excessao, categoria, tag, categoriaTerm
+                excessao,
+                normalizeExpressionParams(categoria),
+                normalizeExpressionParams(tag),
+                categoriaTerm
         );
         ActivityPageResult result = activityUseCase.listWithFilters(filterParams, page, limit);
 
@@ -160,5 +164,52 @@ public class ActivitiesController {
     }
 
     public record DeleteCompositeRequest(Long linkId, java.util.List<Long> fileIds) {}
+
+    static List<String> normalizeExpressionParams(List<String> values) {
+        if (values == null) {
+            return null;
+        }
+
+        return values.stream()
+                .flatMap(ActivitiesController::splitExpressionParam)
+                .toList();
+    }
+
+    private static Stream<String> splitExpressionParam(String value) {
+        if (value == null || value.isBlank()) {
+            return Stream.empty();
+        }
+
+        List<String> expressions = new ArrayList<>();
+        StringBuilder current = new StringBuilder();
+        Character quote = null;
+
+        for (int i = 0; i < value.length(); i++) {
+            char c = value.charAt(i);
+
+            if ((c == '"' || c == '\'') && (quote == null || quote == c)) {
+                quote = quote == null ? c : null;
+                continue;
+            }
+
+            if ((c == ',' || c == ';') && quote == null) {
+                addExpression(expressions, current);
+                continue;
+            }
+
+            current.append(c);
+        }
+
+        addExpression(expressions, current);
+        return expressions.stream();
+    }
+
+    private static void addExpression(List<String> expressions, StringBuilder current) {
+        String expression = current.toString().strip();
+        if (!expression.isBlank()) {
+            expressions.add(expression);
+        }
+        current.setLength(0);
+    }
 
 }

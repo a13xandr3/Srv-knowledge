@@ -21,7 +21,11 @@ public record ActivityFilterParams(
         if (value == null) {
             return "";
         }
-        String trimmed = value.strip().toLowerCase(new Locale("pt", "BR"));
+        String trimmed = value
+                .replace('\u00A0', ' ')
+                .strip()
+                .replaceAll("\\s+", " ")
+                .toLowerCase(new Locale("pt", "BR"));
         String normalized = Normalizer.normalize(trimmed, Normalizer.Form.NFD);
         return normalized.replaceAll("\\p{M}", "");
     }
