@@ -1,9 +1,11 @@
 package br.com.knowledgebase.adapters.outbound.persistence;
 
+import br.com.knowledgebase.adapters.outbound.persistence.jpa.FileSnapshotRow;
 import br.com.knowledgebase.adapters.outbound.persistence.jpa.SpringDataFileJpaRepository;
 import br.com.knowledgebase.adapters.outbound.persistence.jpa.entity.FileAssetJpaEntity;
 import br.com.knowledgebase.domain.model.ContentEncoding;
 import br.com.knowledgebase.domain.model.FileAsset;
+import br.com.knowledgebase.domain.model.Snapshot;
 import br.com.knowledgebase.domain.ports.out.FileRepositoryPort;
 import org.springframework.stereotype.Repository;
 
@@ -33,6 +35,11 @@ public class FileRepositoryJpaAdapter implements FileRepositoryPort {
     }
 
     @Override
+    public Optional<Snapshot> findSnapshotById(Long id) {
+        return repo.findSnapshotRowById(id).map(this::toSnapshot);
+    }
+
+    @Override
     public void deleteById(Long id) {
         repo.deleteById(id);
     }
@@ -49,7 +56,27 @@ public class FileRepositoryJpaAdapter implements FileRepositoryPort {
                 .toList();
     }
 
+    @Override
+    public List<Snapshot> findSnapshotsByIds(List<Long> ids) {
+        return repo.findSnapshotRowsByIds(ids).stream()
+                .map(this::toSnapshot)
+                .toList();
+    }
+
     // ========== MAPEAMENTOS PRIVADOS ==========
+
+    private Snapshot toSnapshot(FileSnapshotRow row) {
+        return new Snapshot(
+                row.id(),
+                row.filename(),
+                row.mimeType(),
+                ContentEncoding.from(row.contentEncoding()),
+                row.gzipSizeBytes(),
+                row.originalSizeBytes(),
+                row.sha256Hex(),
+                null
+        );
+    }
 
     private FileAsset toDomain(FileAssetJpaEntity e) {
         // Ordem e tipos alinhados ao construtor que você já usou no primeiro findById:
@@ -86,4 +113,3 @@ public class FileRepositoryJpaAdapter implements FileRepositoryPort {
         return e;
     }
 }
-

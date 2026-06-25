@@ -54,6 +54,10 @@ public class FileService implements
 
     @Override
     public Snapshot get(Long id, boolean includeBase64) {
+        if (!includeBase64) {
+            return repo.findSnapshotById(id).orElseThrow(() -> new FileNotFoundException(id));
+        }
+
         FileAsset fe = repo.findById(id).orElseThrow(() -> new FileNotFoundException(id));
         String base64 = includeBase64 ? Base64.getEncoder().encodeToString(fe.getPayload()) : null;
         return new Snapshot(
@@ -66,6 +70,19 @@ public class FileService implements
     @Override
     public List<Snapshot> getAllPreservingOrder(List<Long> ids, boolean includeBase64) {
         if (ids == null || ids.isEmpty()) return List.of();
+        if (!includeBase64) {
+            var list = repo.findSnapshotsByIds(ids);
+            var map = new HashMap<Long, Snapshot>(list.size());
+            for (var s : list) map.put(s.id(), s);
+
+            var out = new ArrayList<Snapshot>(ids.size());
+            for (Long id : ids) {
+                var s = map.get(id);
+                if (s != null) out.add(s);
+            }
+            return out;
+        }
+
         var list = repo.findAllByIds(ids);
         var map = new HashMap<Long, FileAsset>(list.size());
         for (var fe : list) map.put(fe.getId(), fe);
